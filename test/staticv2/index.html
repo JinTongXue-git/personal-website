@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页 - Personal Website</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        main {
+            padding-top: 64px;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse 80% 50% at center, rgba(0, 212, 255, 0.06) 0%, transparent 70%);
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.03) 0%, transparent 60%);
+            transform: translate(-50%, -50%);
+            animation: pulseGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.8;
+            }
+        }
+
+        .hero-content {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            padding: 0 20px;
+        }
+
+        .eye-container {
+            width: 140px;
+            height: 100px;
+            margin: 0 auto 50px;
+            position: relative;
+            animation: fadeInUp 0.8s ease forwards;
+            perspective: 1000px;
+        }
+
+        .eye {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(145deg, #1f1f1f 0%, #141414 100%);
+            border-radius: 50%;
+            position: absolute;
+            border: 3px solid var(--accent);
+            overflow: hidden;
+            animation: eyeOpen 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            opacity: 0;
+            box-shadow: 
+                0 0 20px rgba(0, 212, 255, 0.3),
+                inset 0 0 20px rgba(0, 212, 255, 0.1);
+        }
+
+        .eye.left {
+            left: 0;
+            animation-delay: 0.3s;
+        }
+
+        .eye.right {
+            right: 0;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes eyeOpen {
+            0% {
+                opacity: 0;
+                transform: scaleY(0.05) scaleX(1);
+                box-shadow: none;
+            }
+            50% {
+                opacity: 1;
+                transform: scaleY(0.05) scaleX(1);
+                box-shadow: none;
+            }
+            60% {
+                transform: scaleY(1.1) scaleX(1);
+            }
+            80% {
+                transform: scaleY(0.9) scaleX(1);
+            }
+            100% {
+                opacity: 1;
+                transform: scaleY(1) scaleX(1);
+                box-shadow: 
+                    0 0 20px rgba(0, 212, 255, 0.3),
+                    inset 0 0 20px rgba(0, 212, 255, 0.1);
+            }
+        }
+
+        .eye-inner {
+            width: 38px;
+            height: 38px;
+            background: #ffffff;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.15s ease-out;
+        }
+
+        .pupil-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pupil {
+            width: 22px;
+            height: 22px;
+            background: #000;
+            border-radius: 50%;
+            position: relative;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .pupil::after {
+            content: '';
+            position: absolute;
+            top: 30%;
+            left: 30%;
+            width: 40%;
+            height: 40%;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+        }
+
+        .reflection {
+            width: 8px;
+            height: 8px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            top: 6px;
+            left: 8px;
+            opacity: 0.8;
+        }
+
+        .hero-title {
+            font-size: 64px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            animation: fadeInUp 0.8s ease 0.8s forwards;
+            opacity: 0;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #fff 0%, #b3b3b3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 26px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease 1s forwards;
+            opacity: 0;
+            font-weight: 400;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            animation: fadeInUp 0.8s ease 1.2s forwards;
+            opacity: 0;
+            flex-wrap: wrap;
+        }
+
+        .btn-hero {
+            padding: 14px 36px;
+            font-size: 16px;
+            border-radius: 12px;
+        }
+
+        .skills-section {
+            padding: 120px 0;
+            background: var(--bg-secondary);
+            position: relative;
+        }
+
+        .skills-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 70px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+            border-radius: 2px;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
+        }
+
+        .skill-card {
+            background: var(--bg-card);
+            padding: 36px 24px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skill-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+            transform: scaleX(0);
+            transition: transform 0.35s ease;
+        }
+
+        .skill-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-accent);
+        }
+
+        .skill-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .skill-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .skill-card:hover .skill-icon {
+            transform: scale(1.1);
+        }
+
+        .skill-title {
+            font-size: 19px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .skill-desc {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .features-section {
+            padding: 120px 0;
+            position: relative;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            padding: 48px 32px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.08) 0%, transparent 70%);
+            transition: transform 0.5s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: scale(2.5);
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-icon {
+            width: 72px;
+            height: 72px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 28px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover .feature-icon {
+            background: rgba(0, 212, 255, 0.15);
+            transform: scale(1.05);
+        }
+
+        .feature-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
+
+        .feature-desc {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .stats-section {
+            padding: 120px 0;
+            background: var(--bg-secondary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 30px;
+        }
+
+        .stat-value {
+            font-size: 56px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 40px;
+            }
+
+            .hero-subtitle {
+                font-size: 20px;
+            }
+
+            .eye-container {
+                width: 110px;
+                height: 80px;
+            }
+
+            .eye {
+                width: 48px;
+                height: 48px;
+            }
+
+            .eye-inner {
+                width: 30px;
+                height: 30px;
+            }
+
+            .pupil {
+                width: 18px;
+                height: 18px;
+            }
+
+            .skills-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 16px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .stat-value {
+                font-size: 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 32px;
+            }
+
+            .hero-subtitle {
+                font-size: 17px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-hero {
+                width: 100%;
+                max-width: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">MySite</div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html" class="active">首页</a></li>
+                <li><a href="works.html">作品</a></li>
+                <li><a href="blog.html">博客</a></li>
+                <li><a href="ai-chat.html">AI聊天</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="container hero-content">
+                <div class="eye-container">
+                    <div class="eye left">
+                        <div class="eye-inner">
+                            <div class="pupil-container">
+                                <div class="pupil" id="leftPupil"></div>
+                            </div>
+                            <div class="reflection"></div>
+                        </div>
+                    </div>
+                    <div class="eye right">
+                        <div class="eye-inner">
+                            <div class="pupil-container">
+                                <div class="pupil" id="rightPupil"></div>
+                            </div>
+                            <div class="reflection"></div>
+                        </div>
+                    </div>
+                </div>
+                <h1 class="hero-title">你好，我是开发者</h1>
+                <p class="hero-subtitle">全栈工程师 | AI爱好者 | 技术博主</p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary btn-hero" onclick="scrollToSection('skills-section')">查看技能</button>
+                    <button class="btn btn-secondary btn-hero" onclick="scrollToSection('features-section')">了解更多</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats-section">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-value" id="statProjects">100+</span>
+                        <span class="stat-label">完成项目</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="statYears">5+</span>
+                        <span class="stat-label">从业经验</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="statClients">50+</span>
+                        <span class="stat-label">服务客户</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="statCommits">5000+</span>
+                        <span class="stat-label">代码提交</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="skills-section" id="skills-section">
+            <div class="container">
+                <h2 class="section-title">专业技能</h2>
+                <div class="skills-grid">
+                    <div class="skill-card">
+                        <div class="skill-icon">💻</div>
+                        <h3 class="skill-title">前端开发</h3>
+                        <p class="skill-desc">Vue、React、TypeScript、Tailwind CSS、现代CSS动画</p>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-icon">⚙️</div>
+                        <h3 class="skill-title">后端开发</h3>
+                        <p class="skill-desc">Spring Boot、Node.js、Python、微服务架构</p>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-icon">☁️</div>
+                        <h3 class="skill-title">云服务</h3>
+                        <p class="skill-desc">AWS、Docker、Kubernetes、CI/CD流水线</p>
+                    </div>
+                    <div class="skill-card">
+                        <div class="skill-icon">🤖</div>
+                        <h3 class="skill-title">AI开发</h3>
+                        <p class="skill-desc">LLM集成、AI工具开发、自动化工作流优化</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section" id="features-section">
+            <div class="container">
+                <h2 class="section-title">核心优势</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3 class="feature-title">专注创新</h3>
+                        <p class="feature-desc">持续探索新技术，将最新理念融入项目开发，创造更优质的用户体验和创新解决方案。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3 class="feature-title">高效交付</h3>
+                        <p class="feature-desc">采用敏捷开发流程，确保项目按时高质量交付，满足客户需求和业务目标。</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔧</div>
+                        <h3 class="feature-title">技术深耕</h3>
+                        <p class="feature-desc">深入研究技术原理，解决复杂问题，提供最优技术方案和架构设计。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>关于我</h4>
+                    <p>全栈开发者，热爱技术，乐于分享</p>
+                </div>
+                <div class="footer-section">
+                    <h4>联系方式</h4>
+                    <p>Email: hello@example.com</p>
+                    <p>GitHub: @username</p>
+                </div>
+                <div class="footer-section">
+                    <h4>快速链接</h4>
+                    <ul>
+                        <li><a href="index.html">首页</a></li>
+                        <li><a href="works.html">作品</a></li>
+                        <li><a href="blog.html">博客</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Personal Website. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            const hamburger = document.getElementById('hamburger');
+            navLinks.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        }
+
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        document.addEventListener('mousemove', function(e) {
+            const eyeContainer = document.querySelector('.eye-container');
+            const rect = eyeContainer.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            const deltaX = e.clientX - centerX;
+            const deltaY = e.clientY - centerY;
+            
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            const maxDistance = 180;
+            
+            if (distance < maxDistance) {
+                const ratioX = deltaX / maxDistance;
+                const ratioY = deltaY / maxDistance;
+                
+                const leftPupil = document.getElementById('leftPupil');
+                const rightPupil = document.getElementById('rightPupil');
+                const maxOffset = 6;
+                
+                leftPupil.style.transform = `translate(${ratioX * maxOffset}px, ${ratioY * maxOffset}px)`;
+                rightPupil.style.transform = `translate(${ratioX * maxOffset}px, ${ratioY * maxOffset}px)`;
+            }
+        });
+
+        document.addEventListener('mouseleave', function() {
+            const leftPupil = document.getElementById('leftPupil');
+            const rightPupil = document.getElementById('rightPupil');
+            
+            leftPupil.style.transform = 'translate(0, 0)';
+            rightPupil.style.transform = 'translate(0, 0)';
+        });
+
+        function animateNumbers() {
+            const stats = [
+                { id: 'statProjects', target: 100, suffix: '+' },
+                { id: 'statYears', target: 5, suffix: '+' },
+                { id: 'statClients', target: 50, suffix: '+' },
+                { id: 'statCommits', target: 5000, suffix: '+' }
+            ];
+
+            stats.forEach(stat => {
+                const element = document.getElementById(stat.id);
+                if (!element) return;
+                
+                let current = 0;
+                const duration = 2000;
+                const steps = 60;
+                const increment = stat.target / steps;
+                const stepDuration = duration / steps;
+                
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= stat.target) {
+                        element.textContent = stat.target + stat.suffix;
+                        clearInterval(timer);
+                    } else {
+                        element.textContent = Math.floor(current) + stat.suffix;
+                    }
+                }, stepDuration);
+            });
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateNumbers();
+                    observer.disconnect();
+                }
+            });
+        }, { threshold: 0.3 });
+
+        const statsSection = document.querySelector('.stats-section');
+        if (statsSection) {
+            observer.observe(statsSection);
+        }
+    </script>
+</body>
+</html>

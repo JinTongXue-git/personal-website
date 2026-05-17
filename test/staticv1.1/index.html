@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Website - 个人网站</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/lucide@latest/dist/lucide.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <a href="#home" class="skip-link">跳转到主要内容</a>
+    
+    <nav class="navbar" role="navigation" aria-label="主导航">
+        <div class="container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                        <path d="M2 17l10 5 10-5"></path>
+                        <path d="M2 12l10 5 10-5"></path>
+                    </svg>
+                </div>
+                <span class="logo-text">Portfolio</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home" class="nav-link active">首页</a></li>
+                <li><a href="#works" class="nav-link">作品</a></li>
+                <li><a href="#blog" class="nav-link">博客</a></li>
+                <li><a href="#chat" class="nav-link">AI聊天</a></li>
+                <li><button class="btn btn-primary" aria-label="联系我">联系我</button></li>
+            </ul>
+            <button class="hamburger" aria-label="打开菜单" aria-expanded="false" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <section id="home" class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-bg-gradient"></div>
+        <div class="container hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">你好，我是开发者</h1>
+                <p class="hero-subtitle">全栈工程师 | AI爱好者 | 技术博主</p>
+                <p class="hero-description">专注于Web开发、AI应用和技术分享，致力于创造卓越的数字体验</p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary">查看作品</button>
+                    <button class="btn btn-secondary">了解更多</button>
+                </div>
+            </div>
+            <div class="hero-avatar">
+                <div class="avatar-container">
+                    <div class="avatar-circle">
+                        <div class="avatar-content">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="avatar-icon">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="skills">
+        <div class="container">
+            <h2 class="section-title">技能栈</h2>
+            <div class="skills-grid">
+                <span class="skill-tag">JavaScript</span>
+                <span class="skill-tag">TypeScript</span>
+                <span class="skill-tag">Vue</span>
+                <span class="skill-tag">React</span>
+                <span class="skill-tag">Spring Boot</span>
+                <span class="skill-tag">Node.js</span>
+                <span class="skill-tag">MySQL</span>
+                <span class="skill-tag">MongoDB</span>
+                <span class="skill-tag">Tailwind CSS</span>
+                <span class="skill-tag">Docker</span>
+                <span class="skill-tag">AWS</span>
+                <span class="skill-tag">AI/ML</span>
+            </div>
+        </div>
+    </section>
+
+    <section id="works" class="works">
+        <div class="container">
+            <h2 class="section-title">项目作品</h2>
+            <div class="works-grid">
+                <div class="work-card reveal">
+                    <div class="work-image">
+                        <div class="work-icon">
+                            <i class="lucide-palette"></i>
+                        </div>
+                    </div>
+                    <h3 class="work-title">AI创作平台</h3>
+                    <p class="work-description">基于ComfyUI的可视化AI生图工作流平台，支持多种模型和自定义节点</p>
+                    <div class="work-tags">
+                        <span class="tag">Vue 3</span>
+                        <span class="tag">AI</span>
+                    </div>
+                    <div class="work-card-overlay">
+                        <button class="btn btn-primary">查看详情</button>
+                    </div>
+                </div>
+                <div class="work-card reveal">
+                    <div class="work-image">
+                        <div class="work-icon">
+                            <i class="lucide-building"></i>
+                        </div>
+                    </div>
+                    <h3 class="work-title">企业管理系统</h3>
+                    <p class="work-description">完整的企业级后台管理解决方案，包含权限管理、数据分析等模块</p>
+                    <div class="work-tags">
+                        <span class="tag">Spring Boot</span>
+                        <span class="tag">Vue</span>
+                    </div>
+                    <div class="work-card-overlay">
+                        <button class="btn btn-primary">查看详情</button>
+                    </div>
+                </div>
+                <div class="work-card reveal">
+                    <div class="work-image">
+                        <div class="work-icon">
+                            <i class="lucide-mobile"></i>
+                        </div>
+                    </div>
+                    <h3 class="work-title">移动端应用</h3>
+                    <p class="work-description">跨平台移动应用开发，支持iOS和Android双平台</p>
+                    <div class="work-tags">
+                        <span class="tag">React Native</span>
+                        <span class="tag">TypeScript</span>
+                    </div>
+                    <div class="work-card-overlay">
+                        <button class="btn btn-primary">查看详情</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="blog" class="blog">
+        <div class="container">
+            <h2 class="section-title">技术博客</h2>
+            <div class="blog-list">
+                <article class="blog-card reveal">
+                    <div class="blog-meta">
+                        <span class="blog-date">2026-05-15</span>
+                        <span class="blog-category">前端</span>
+                    </div>
+                    <h3 class="blog-title">Vue 3 组合式API深度解析</h3>
+                    <p class="blog-summary">深入理解Vue 3的Composition API，掌握现代前端开发模式，提升代码复用性和可维护性</p>
+                    <div class="blog-tags">
+                        <span class="tag">Vue</span>
+                        <span class="tag">JavaScript</span>
+                    </div>
+                </article>
+                <article class="blog-card reveal">
+                    <div class="blog-meta">
+                        <span class="blog-date">2026-05-10</span>
+                        <span class="blog-category">后端</span>
+                    </div>
+                    <h3 class="blog-title">Spring Boot 3 新特性详解</h3>
+                    <p class="blog-summary">探索Spring Boot 3的最新特性，包括虚拟线程、改进的AOT编译和新的配置方式</p>
+                    <div class="blog-tags">
+                        <span class="tag">Spring Boot</span>
+                        <span class="tag">Java</span>
+                    </div>
+                </article>
+                <article class="blog-card reveal">
+                    <div class="blog-meta">
+                        <span class="blog-date">2026-05-05</span>
+                        <span class="blog-category">AI</span>
+                    </div>
+                    <h3 class="blog-title">AI编程工作流优化指南</h3>
+                    <p class="blog-summary">如何利用AI工具提升日常开发效率，包括代码生成、调试和文档编写</p>
+                    <div class="blog-tags">
+                        <span class="tag">AI</span>
+                        <span class="tag">Productivity</span>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section id="chat" class="chat-section">
+        <div class="container">
+            <h2 class="section-title">AI聊天</h2>
+            <div class="chat-container" role="log" aria-live="polite">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message bot-message">
+                        <div class="message-content">
+                            <p>你好！我是你的AI助手，有什么可以帮助你的吗？</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input 
+                        type="text" 
+                        id="chatInput" 
+                        placeholder="输入消息..." 
+                        class="chat-input"
+                        aria-label="输入消息"
+                    >
+                    <button class="btn btn-primary chat-send-btn" onclick="sendMessage()" aria-label="发送消息">
+                        <i class="lucide-send"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>关于我</h4>
+                    <p>全栈开发者，热爱技术，乐于分享，致力于创造有价值的产品</p>
+                </div>
+                <div class="footer-section">
+                    <h4>联系方式</h4>
+                    <p>Email: hello@example.com</p>
+                    <p>GitHub: @username</p>
+                </div>
+                <div class="footer-section">
+                    <h4>快速链接</h4>
+                    <ul>
+                        <li><a href="#home">首页</a></li>
+                        <li><a href="#works">作品</a></li>
+                        <li><a href="#blog">博客</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Personal Website. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI聊天 - Personal Website</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        main {
+            padding-top: 64px;
+            height: calc(100vh - 64px);
+            display: flex;
+        }
+
+        .chat-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar.collapsed {
+            width: 60px;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 600;
+            flex: 1;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .collapse-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.25s ease;
+            flex-shrink: 0;
+        }
+
+        .collapse-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .new-chat-btn {
+            margin: 16px;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            border: none;
+            border-radius: 12px;
+            color: var(--bg-primary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .new-chat-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.35);
+        }
+
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .history-item {
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 4px;
+        }
+
+        .history-item:hover {
+            background: var(--bg-hover);
+        }
+
+        .history-item.active {
+            background: rgba(0, 212, 255, 0.12);
+            border-left: 3px solid var(--accent);
+        }
+
+        .history-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 16px;
+        }
+
+        .history-content {
+            flex: 1;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        .history-title {
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 3px;
+            color: var(--text-primary);
+        }
+
+        .history-preview {
+            font-size: 12px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar.collapsed .sidebar-title,
+        .sidebar.collapsed .new-chat-btn,
+        .sidebar.collapsed .history-content {
+            display: none;
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            justify-content: center;
+        }
+
+        .sidebar.collapsed .history-item {
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background: var(--bg-primary);
+        }
+
+        .chat-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: var(--bg-secondary);
+        }
+
+        .chat-avatar {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--accent), var(--success));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .chat-info {
+            flex: 1;
+        }
+
+        .chat-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chat-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 10px;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .action-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .action-btn::after {
+            content: attr(title);
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-tertiary);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .action-btn:hover::after {
+            opacity: 1;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px 40px;
+            position: relative;
+        }
+
+        .messages-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at top, rgba(0, 212, 255, 0.02) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .message {
+            margin-bottom: 32px;
+            max-width: 75%;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .message.user {
+            margin-left: auto;
+        }
+
+        .message-bubble {
+            padding: 18px 22px;
+            border-radius: 18px;
+            line-height: 1.7;
+            font-size: 15px;
+            position: relative;
+        }
+
+        .message.bot .message-bubble {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 18px 18px 18px 6px;
+        }
+
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: var(--bg-primary);
+            border-radius: 18px 18px 6px 18px;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.25);
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .message.bot .message-avatar {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+        }
+
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, var(--accent), var(--success));
+            margin-left: auto;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 6px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 18px 18px 18px 6px;
+            width: fit-content;
+        }
+
+        .typing-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .input-area {
+            padding: 20px 24px;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 10px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+
+        .input-tools {
+            display: flex;
+            gap: 6px;
+        }
+
+        .tool-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 10px;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .tool-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .tool-btn::after {
+            content: attr(title);
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-tertiary);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .tool-btn:hover::after {
+            opacity: 1;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 15px;
+            padding: 12px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .chat-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            border: none;
+            border-radius: 14px;
+            padding: 12px 24px;
+            color: var(--bg-primary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.35);
+        }
+
+        .send-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .upload-area {
+            display: none;
+            padding: 24px;
+            border: 2px dashed var(--border-color);
+            border-radius: 14px;
+            text-align: center;
+            margin-bottom: 16px;
+            transition: all 0.25s ease;
+            background: var(--bg-card);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--accent);
+            background: rgba(0, 212, 255, 0.08);
+        }
+
+        .upload-area.active {
+            display: block;
+        }
+
+        .upload-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .upload-hint {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .voice-recording {
+            display: none;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            background: rgba(233, 69, 96, 0.12);
+            border-radius: 14px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(233, 69, 96, 0.2);
+        }
+
+        .voice-recording.active {
+            display: flex;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .voice-wave {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .wave-bar {
+            width: 5px;
+            height: 24px;
+            background: linear-gradient(180deg, #e94560, #ff6b6b);
+            border-radius: 3px;
+            animation: wave 0.6s infinite ease-in-out;
+        }
+
+        .wave-bar:nth-child(1) { height: 10px; animation-delay: 0s; }
+        .wave-bar:nth-child(2) { height: 20px; animation-delay: 0.1s; }
+        .wave-bar:nth-child(3) { height: 14px; animation-delay: 0.2s; }
+        .wave-bar:nth-child(4) { height: 24px; animation-delay: 0.3s; }
+        .wave-bar:nth-child(5) { height: 16px; animation-delay: 0.4s; }
+        .wave-bar:nth-child(6) { height: 22px; animation-delay: 0.5s; }
+
+        @keyframes wave {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.4); }
+        }
+
+        .voice-text {
+            color: #e94560;
+            font-weight: 600;
+            font-size: 15px;
+            flex: 1;
+        }
+
+        .voice-duration {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .cancel-voice-btn {
+            background: none;
+            border: none;
+            color: #e94560;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 10px;
+            transition: all 0.25s ease;
+        }
+
+        .cancel-voice-btn:hover {
+            background: rgba(233, 69, 96, 0.15);
+        }
+
+        .fullscreen-overlay {
+            display: none;
+            position: fixed;
+            top: 64px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-primary);
+            z-index: 100;
+            flex-direction: column;
+            animation: fadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+        }
+
+        .fullscreen-overlay.active {
+            display: flex;
+        }
+
+        .fullscreen-overlay::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at top, rgba(0, 212, 255, 0.03) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .fullscreen-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 1;
+        }
+
+        .fullscreen-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .fullscreen-title::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .fullscreen-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .fullscreen-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .fullscreen-input {
+            padding: 20px 24px;
+            border-top: 1px solid var(--border-color);
+            background: rgba(18, 18, 18, 0.95);
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 1;
+        }
+
+        .fullscreen-editor-wrapper {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+
+        .fullscreen-editor-wrapper:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+
+        .editor-toolbar {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            flex-wrap: wrap;
+        }
+
+        .toolbar-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .toolbar-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .toolbar-btn.active {
+            background: rgba(0, 212, 255, 0.15);
+            color: var(--accent);
+        }
+
+        .fullscreen-textarea {
+            width: 100%;
+            min-height: 180px;
+            background: var(--bg-card);
+            border: none;
+            padding: 20px;
+            color: var(--text-primary);
+            font-family: 'Inter', monospace;
+            font-size: 15px;
+            line-height: 1.7;
+            outline: none;
+            resize: vertical;
+            transition: all 0.25s ease;
+        }
+
+        .fullscreen-textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .fullscreen-actions-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .editor-preview {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            display: none;
+        }
+
+        .editor-preview.active {
+            display: block;
+        }
+
+        .preview-content {
+            color: var(--text-primary);
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        .preview-content h1 {
+            font-size: 28px;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .preview-content h2 {
+            font-size: 22px;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .preview-content h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .preview-content code {
+            background: rgba(0, 212, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            color: var(--accent);
+        }
+
+        .preview-content pre {
+            background: var(--bg-tertiary);
+            padding: 16px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 12px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .preview-content pre code {
+            background: none;
+            padding: 0;
+            color: var(--text-primary);
+        }
+
+        .preview-content blockquote {
+            border-left: 3px solid var(--accent);
+            padding-left: 16px;
+            margin: 12px 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .preview-content ul,
+        .preview-content ol {
+            padding-left: 24px;
+            margin: 12px 0;
+        }
+
+        .preview-content li {
+            margin-bottom: 6px;
+        }
+
+        .preview-content a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .preview-content a:hover {
+            text-decoration: underline;
+        }
+
+        .preview-content hr {
+            border: none;
+            height: 1px;
+            background: var(--border-color);
+            margin: 20px 0;
+        }
+
+        .error-message {
+            display: none;
+            padding: 16px;
+            background: rgba(233, 69, 96, 0.12);
+            border: 1px solid rgba(233, 69, 96, 0.2);
+            border-radius: 10px;
+            margin-bottom: 16px;
+            color: #e94560;
+            font-size: 14px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .error-message.active {
+            display: block;
+        }
+
+        .loading-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .mini-chat {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 420px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 50;
+        }
+
+        .mini-chat.minimized {
+            width: 64px;
+            height: 64px;
+        }
+
+        .mini-header {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .mini-header:hover {
+            background: var(--bg-hover);
+        }
+
+        .mini-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent), var(--success));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .mini-title {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .mini-expand-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .mini-expand-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .mini-messages {
+            height: 220px;
+            overflow-y: auto;
+            padding: 14px;
+        }
+
+        .mini-message {
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            line-height: 1.5;
+            max-width: 85%;
+        }
+
+        .mini-message.bot {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .mini-message.user {
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--text-primary);
+            margin-left: auto;
+        }
+
+        .mini-input {
+            padding: 14px;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .mini-chat-input {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .mini-chat-input:focus {
+            border-color: var(--accent);
+        }
+
+        .mini-chat-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .mini-send-btn {
+            background: var(--accent);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            color: var(--bg-primary);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .mini-send-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
+        }
+
+        .mini-chat.minimized .mini-header > *:not(.mini-avatar),
+        .mini-chat.minimized .mini-messages,
+        .mini-chat.minimized .mini-input {
+            display: none;
+        }
+
+        .mini-chat.minimized .mini-avatar {
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 64px;
+                bottom: 0;
+                z-index: 200;
+                transform: translateX(-100%);
+                transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar.collapsed {
+                transform: translateX(0);
+                width: 60px;
+            }
+
+            .chat-area {
+                width: 100%;
+            }
+
+            .messages-container {
+                padding: 20px;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+
+            .mini-chat {
+                width: calc(100% - 48px);
+            }
+
+            .chat-header {
+                padding: 16px;
+            }
+
+            .input-area {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">MySite</div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="works.html">作品</a></li>
+                <li><a href="blog.html">博客</a></li>
+                <li><a href="ai-chat.html" class="active">AI聊天</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="chat-container">
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <span class="sidebar-title">AI助手</span>
+                    <button class="collapse-btn" onclick="toggleSidebar()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 18l-6-6 6-6"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <button class="new-chat-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v14"/>
+                        <path d="M5 12h14"/>
+                    </svg>
+                    新对话
+                </button>
+                
+                <div class="history-list">
+                    <div class="history-item active">
+                        <div class="history-icon">🤖</div>
+                        <div class="history-content">
+                            <div class="history-title">新对话</div>
+                            <div class="history-preview">开始新的对话...</div>
+                        </div>
+                    </div>
+                    <div class="history-item">
+                        <div class="history-icon">💻</div>
+                        <div class="history-content">
+                            <div class="history-title">Vue 3教程</div>
+                            <div class="history-preview">如何使用Composition API...</div>
+                        </div>
+                    </div>
+                    <div class="history-item">
+                        <div class="history-icon">⚙️</div>
+                        <div class="history-content">
+                            <div class="history-title">Spring Boot配置</div>
+                            <div class="history-preview">数据库连接配置...</div>
+                        </div>
+                    </div>
+                    <div class="history-item">
+                        <div class="history-icon">🤔</div>
+                        <div class="history-content">
+                            <div class="history-title">代码审查</div>
+                            <div class="history-preview">帮我看看这段代码...</div>
+                        </div>
+                    </div>
+                    <div class="history-item">
+                        <div class="history-icon">📊</div>
+                        <div class="history-content">
+                            <div class="history-title">数据分析</div>
+                            <div class="history-preview">如何分析用户数据...</div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="chat-area">
+                <header class="chat-header">
+                    <div class="chat-avatar">🤖</div>
+                    <div class="chat-info">
+                        <div class="chat-title">AI助手</div>
+                        <div class="chat-subtitle">随时为您提供帮助</div>
+                    </div>
+                    <div class="chat-actions">
+                        <button class="action-btn" title="放大" onclick="openFullscreen()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 21V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM15 3h6v6M9 21H3v-6"/>
+                            </svg>
+                        </button>
+                        <button class="action-btn" title="设置">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </button>
+                    </div>
+                </header>
+
+                <div class="messages-container" id="messagesContainer">
+                    <div class="message bot">
+                        <div class="message-avatar">🤖</div>
+                        <div class="message-bubble">
+                            <p>你好！我是你的AI助手，有什么可以帮助你的吗？</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-area">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-text">📁 拖拽文件到这里上传，或点击选择文件</div>
+                        <div class="upload-hint">支持 PDF、DOC、图片等格式</div>
+                    </div>
+
+                    <div class="voice-recording" id="voiceRecording">
+                        <div class="voice-wave">
+                            <span class="wave-bar"></span>
+                            <span class="wave-bar"></span>
+                            <span class="wave-bar"></span>
+                            <span class="wave-bar"></span>
+                            <span class="wave-bar"></span>
+                            <span class="wave-bar"></span>
+                        </div>
+                        <span class="voice-text">正在录音...</span>
+                        <span class="voice-duration" id="voiceDuration">00:00</span>
+                        <button class="cancel-voice-btn" onclick="stopVoiceRecording()">✕</button>
+                    </div>
+
+                    <div class="input-wrapper">
+                        <div class="input-tools">
+                            <button class="tool-btn" id="uploadBtn" title="上传文件" onclick="toggleUpload()">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                            </button>
+                            <button class="tool-btn" id="voiceBtn" title="语音输入" onclick="toggleVoiceRecording()">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <input type="text" class="chat-input" id="chatInput" placeholder="输入消息..." onkeypress="handleKeyPress(event)">
+                        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 2L11 13"/>
+                                <path d="M22 2L15 22L11 13L2 9"/>
+                            </svg>
+                            发送
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="fullscreen-overlay" id="fullscreenOverlay">
+            <div class="fullscreen-header">
+                <span class="fullscreen-title">AI聊天 - 全屏模式</span>
+                <div class="fullscreen-actions">
+                    <button class="action-btn" title="预览" onclick="togglePreview()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                            <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                    </button>
+                    <button class="action-btn" onclick="closeFullscreen()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12l9-9 9 9M5 10v10a1 1 0 0 0 1 1h3m10-11l2 2m-2-2v10a1 1 0 0 1-1 1h-3m-6 0a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1m-6 0h6"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="fullscreen-content" id="fullscreenContent">
+                <div class="message bot">
+                    <div class="message-avatar">🤖</div>
+                    <div class="message-bubble">
+                        <p>欢迎使用全屏模式！在这里你可以编写更复杂的内容，支持 Markdown 格式。</p>
+                    </div>
+                </div>
+            </div>
+            <div class="fullscreen-input">
+                <div class="error-message" id="errorMessage">消息不能为空</div>
+                <div class="fullscreen-editor-wrapper">
+                    <div class="editor-toolbar">
+                        <button class="toolbar-btn" title="加粗" onclick="insertMarkdown('**', '**')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M6 4h6a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/>
+                                <path d="M6 12h6a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/>
+                            </svg>
+                        </button>
+                        <button class="toolbar-btn" title="斜体" onclick="insertMarkdown('*', '*')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 4l2 2-2 2M10 14l-2-2 2-2"/>
+                                <path d="M18 20c-3 0-7-2-7-7V4"/>
+                                <path d="M6 20c3 0 7-2 7-7V4"/>
+                            </svg>
+                        </button>
+                        <button class="toolbar-btn" title="代码" onclick="insertMarkdown('`', '`')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="16 18 22 12 16 6"/>
+                                <polyline points="8 6 2 12 8 18"/>
+                            </svg>
+                        </button>
+                        <button class="toolbar-btn" title="代码块" onclick="insertMarkdown('\n```\n', '\n```\n')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="9" y1="3" x2="9" y2="21"/>
+                            </svg>
+                        </button>
+                        <span class="toolbar-divider"></span>
+                        <button class="toolbar-btn" title="标题1" onclick="insertMarkdown('# ', '')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 12h8M4 18h8M4 6h8"/>
+                                <path d="M14 6h6M14 12h6M14 18h6"/>
+                            </svg>
+                        </button>
+                        <button class="toolbar-btn" title="标题2" onclick="insertMarkdown('## ', '')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 14h6M4 18h6M4 6h12M4 10h12"/>
+                                <path d="M16 6h6M16 10h6M16 14h6M16 18h6"/>
+                            </svg>
+                        </button>
+                        <span class="toolbar-divider"></span>
+                        <button class="toolbar-btn" title="列表" onclick="insertMarkdown('- ', '')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="8" y1="6" x2="21" y2="6"/>
+                                <line x1="8" y1="12" x2="21" y2="12"/>
+                                <line x1="8" y1="18" x2="21" y2="18"/>
+                                <line x1="3" y1="6" x2="3.01" y2="6"/>
+                                <line x1="3" y1="12" x2="3.01" y2="12"/>
+                                <line x1="3" y1="18" x2="3.01" y2="18"/>
+                            </svg>
+                        </button>
+                        <button class="toolbar-btn" title="引用" onclick="insertMarkdown('> ', '')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 14h6M6 16h2a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2z"/>
+                            </svg>
+                        </button>
+                        <button class="toolbar-btn" title="链接" onclick="insertMarkdown('[', '](url)')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <textarea class="fullscreen-textarea" id="fullscreenTextarea" placeholder="输入消息，支持 Markdown 格式..."></textarea>
+                    <div class="editor-preview" id="editorPreview">
+                        <div class="preview-content" id="previewContent"></div>
+                    </div>
+                </div>
+                <div class="fullscreen-actions-row">
+                    <button class="btn btn-secondary" onclick="clearFullscreenText()">清空</button>
+                    <button class="btn btn-outline" onclick="togglePreview()">预览</button>
+                    <button class="btn btn-primary" onclick="sendFullscreenMessage()">发送</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="mini-chat" id="miniChat">
+            <div class="mini-header" onclick="toggleMiniChat()">
+                <div class="mini-avatar">🤖</div>
+                <span class="mini-title">AI助手</span>
+                <button class="mini-expand-btn" onclick="event.stopPropagation(); openFullscreen()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 21V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM15 3h6v6M9 21H3v-6"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="mini-messages" id="miniMessages">
+                <div class="mini-message bot">你好！</div>
+            </div>
+            <div class="mini-input">
+                <input type="text" class="mini-chat-input" id="miniInput" placeholder="输入..." onkeypress="handleMiniKeyPress(event)">
+                <button class="mini-send-btn" onclick="sendMiniMessage()">发送</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            const hamburger = document.getElementById('hamburger');
+            navLinks.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
+        }
+
+        function toggleUpload() {
+            const uploadArea = document.getElementById('uploadArea');
+            uploadArea.classList.toggle('active');
+        }
+
+        let isRecording = false;
+        let voiceTimer = null;
+        let voiceSeconds = 0;
+
+        function toggleVoiceRecording() {
+            const voiceRecording = document.getElementById('voiceRecording');
+            const voiceBtn = document.getElementById('voiceBtn');
+            
+            isRecording = !isRecording;
+            
+            if (isRecording) {
+                voiceRecording.classList.add('active');
+                voiceBtn.style.color = '#e94560';
+                voiceSeconds = 0;
+                voiceTimer = setInterval(() => {
+                    voiceSeconds++;
+                    const mins = Math.floor(voiceSeconds / 60);
+                    const secs = voiceSeconds % 60;
+                    document.getElementById('voiceDuration').textContent = 
+                        `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }, 1000);
+            } else {
+                stopVoiceRecording();
+            }
+        }
+
+        function stopVoiceRecording() {
+            isRecording = false;
+            const voiceRecording = document.getElementById('voiceRecording');
+            const voiceBtn = document.getElementById('voiceBtn');
+            voiceRecording.classList.remove('active');
+            voiceBtn.style.color = '';
+            if (voiceTimer) {
+                clearInterval(voiceTimer);
+                voiceTimer = null;
+            }
+            document.getElementById('voiceDuration').textContent = '00:00';
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const container = document.getElementById('messagesContainer');
+            
+            container.innerHTML += `
+                <div class="message user">
+                    <div class="message-avatar">👤</div>
+                    <div class="message-bubble">${escapeHtml(message)}</div>
+                </div>
+                <div class="typing-indicator">
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                </div>
+            `;
+
+            input.value = '';
+            container.scrollTop = container.scrollHeight;
+
+            setTimeout(() => {
+                const typingIndicator = document.querySelector('.typing-indicator');
+                if (typingIndicator) typingIndicator.remove();
+                
+                const responses = [
+                    '这是一个很好的问题！让我来详细解答一下...',
+                    '我理解你的需求，这是我的建议：',
+                    '好的，我来帮你分析这个问题。首先...',
+                    '感谢你的提问！关于这个话题，我的看法是：',
+                    '这个问题很有意思，让我思考一下...',
+                    '根据我的分析，有几个关键点需要注意：',
+                    '我来为你提供一个详细的解答：'
+                ];
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                
+                container.innerHTML += `
+                    <div class="message bot">
+                        <div class="message-avatar">🤖</div>
+                        <div class="message-bubble">${randomResponse}</div>
+                    </div>
+                `;
+                container.scrollTop = container.scrollHeight;
+            }, 1500);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function openFullscreen() {
+            const overlay = document.getElementById('fullscreenOverlay');
+            const miniChat = document.getElementById('miniChat');
+            overlay.classList.add('active');
+            miniChat.classList.add('minimized');
+        }
+
+        function closeFullscreen() {
+            const overlay = document.getElementById('fullscreenOverlay');
+            const miniChat = document.getElementById('miniChat');
+            const preview = document.getElementById('editorPreview');
+            overlay.classList.remove('active');
+            miniChat.classList.remove('minimized');
+            preview.classList.remove('active');
+        }
+
+        let isPreviewMode = false;
+
+        function togglePreview() {
+            const preview = document.getElementById('editorPreview');
+            const textarea = document.getElementById('fullscreenTextarea');
+            isPreviewMode = !isPreviewMode;
+            
+            if (isPreviewMode) {
+                preview.classList.add('active');
+                renderMarkdown(textarea.value);
+            } else {
+                preview.classList.remove('active');
+            }
+        }
+
+        function renderMarkdown(text) {
+            const previewContent = document.getElementById('previewContent');
+            let html = text;
+            
+            html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+            html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+            html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+            
+            html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+            
+            html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+            
+            html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+            
+            html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+            
+            html = html.replace(/^\- (.+)$/gm, '<li>$1</li>');
+            html = html.replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>');
+            
+            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+            
+            html = html.replace(/---/g, '<hr>');
+            
+            html = html.replace(/\n/g, '<br>');
+            
+            previewContent.innerHTML = html;
+        }
+
+        function insertMarkdown(before, after) {
+            const textarea = document.getElementById('fullscreenTextarea');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end);
+            const newValue = textarea.value.substring(0, start) + before + selectedText + after + textarea.value.substring(end);
+            
+            textarea.value = newValue;
+            
+            const cursorPos = start + before.length + selectedText.length;
+            textarea.focus();
+            textarea.setSelectionRange(cursorPos, cursorPos);
+            
+            if (isPreviewMode) {
+                renderMarkdown(textarea.value);
+            }
+        }
+
+        function clearFullscreenText() {
+            const textarea = document.getElementById('fullscreenTextarea');
+            const preview = document.getElementById('editorPreview');
+            const error = document.getElementById('errorMessage');
+            
+            textarea.value = '';
+            preview.classList.remove('active');
+            error.classList.remove('active');
+            isPreviewMode = false;
+            textarea.focus();
+        }
+
+        function sendFullscreenMessage() {
+            const textarea = document.getElementById('fullscreenTextarea');
+            const content = document.getElementById('fullscreenContent');
+            const error = document.getElementById('errorMessage');
+            const preview = document.getElementById('editorPreview');
+            const message = textarea.value.trim();
+            
+            if (!message) {
+                error.classList.add('active');
+                setTimeout(() => {
+                    error.classList.remove('active');
+                }, 3000);
+                return;
+            }
+
+            content.innerHTML += `
+                <div class="message user">
+                    <div class="message-avatar">👤</div>
+                    <div class="message-bubble">${escapeHtml(message)}</div>
+                </div>
+            `;
+            
+            content.innerHTML += `
+                <div class="loading-indicator">
+                    <div class="loading-spinner"></div>
+                    <span>正在处理您的请求...</span>
+                </div>
+            `;
+            
+            textarea.value = '';
+            preview.classList.remove('active');
+            isPreviewMode = false;
+            error.classList.remove('active');
+            content.scrollTop = content.scrollHeight;
+
+            setTimeout(() => {
+                const loadingIndicator = document.querySelector('.loading-indicator');
+                if (loadingIndicator) loadingIndicator.remove();
+                
+                const responses = [
+                    '已收到您的请求，正在为您生成详细的回答...',
+                    '这是一个很有深度的问题，让我为您详细分析：',
+                    '根据您的输入，我为您整理了以下内容：',
+                    '感谢您的详细描述！以下是我的分析：',
+                    '好的，我已经理解了您的需求。这是我的建议：'
+                ];
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                
+                content.innerHTML += `
+                    <div class="message bot">
+                        <div class="message-avatar">🤖</div>
+                        <div class="message-bubble">${randomResponse}</div>
+                    </div>
+                `;
+                content.scrollTop = content.scrollHeight;
+            }, 2000);
+        }
+
+        function toggleMiniChat() {
+            const miniChat = document.getElementById('miniChat');
+            miniChat.classList.toggle('minimized');
+        }
+
+        function handleMiniKeyPress(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                sendMiniMessage();
+            }
+        }
+
+        function sendMiniMessage() {
+            const input = document.getElementById('miniInput');
+            const messages = document.getElementById('miniMessages');
+            const message = input.value.trim();
+            if (!message) return;
+
+            messages.innerHTML += `<div class="mini-message user">${escapeHtml(message)}</div>`;
+            input.value = '';
+            messages.scrollTop = messages.scrollHeight;
+
+            setTimeout(() => {
+                messages.innerHTML += '<div class="mini-message bot">收到！</div>';
+                messages.scrollTop = messages.scrollHeight;
+            }, 500);
+        }
+
+        document.getElementById('fullscreenTextarea').addEventListener('input', function() {
+            if (isPreviewMode) {
+                renderMarkdown(this.value);
+            }
+        });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && document.getElementById('fullscreenOverlay').classList.contains('active')) {
+                closeFullscreen();
+            }
+            
+            if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+                event.preventDefault();
+                sendFullscreenMessage();
+            }
+        });
+    </script>
+</body>
+</html>

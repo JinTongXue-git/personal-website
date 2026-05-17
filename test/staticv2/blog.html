@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博客 - Personal Website</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        main {
+            padding-top: 64px;
+        }
+
+        .blog-container {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 48px;
+            padding-bottom: 40px;
+        }
+
+        .blog-list {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .blog-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 28px;
+            border: 1px solid var(--border-color);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .blog-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+            transform: scaleX(0);
+            transition: transform 0.35s ease;
+        }
+
+        .blog-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-accent);
+        }
+
+        .blog-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .blog-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .blog-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            color: var(--text-muted);
+            font-size: 13px;
+            align-items: center;
+        }
+
+        .blog-category {
+            padding: 4px 12px;
+            background: rgba(0, 212, 255, 0.15);
+            color: var(--accent);
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .blog-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            line-height: 1.4;
+            color: var(--text-primary);
+            transition: color 0.2s ease;
+        }
+
+        .blog-card:hover .blog-title {
+            color: var(--accent);
+        }
+
+        .blog-summary {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .blog-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .blog-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            padding: 4px 12px;
+            background: var(--bg-hover);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .tag:hover {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--accent);
+        }
+
+        .blog-read {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-muted);
+            font-size: 13px;
+            transition: color 0.2s ease;
+        }
+
+        .blog-card:hover .blog-read {
+            color: var(--accent);
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 84px;
+            height: fit-content;
+        }
+
+        .sidebar-section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .sidebar-title::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 30px;
+            height: 2px;
+            background: var(--accent);
+            border-radius: 1px;
+        }
+
+        .author-card {
+            text-align: center;
+        }
+
+        .author-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--success));
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .author-name {
+            font-weight: 600;
+            font-size: 17px;
+            margin-bottom: 6px;
+        }
+
+        .author-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .author-bio {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            font-size: 24px;
+            color: var(--accent);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .category-list {
+            list-style: none;
+        }
+
+        .category-item {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .category-item:hover {
+            color: var(--accent);
+            padding-left: 8px;
+        }
+
+        .category-item:last-child {
+            border-bottom: none;
+        }
+
+        .category-count {
+            padding: 2px 8px;
+            background: var(--bg-hover);
+            border-radius: 10px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .recent-posts {
+            list-style: none;
+        }
+
+        .recent-item {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .recent-item:hover {
+            padding-left: 8px;
+            color: var(--accent);
+        }
+
+        .recent-item:last-child {
+            border-bottom: none;
+        }
+
+        .recent-title {
+            font-size: 14px;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .recent-date {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .article-detail {
+            display: none;
+        }
+
+        .article-detail.active {
+            display: block;
+        }
+
+        .article-header {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .article-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+
+        .article-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .article-content {
+            line-height: 1.9;
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        .article-content h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 40px 0 20px;
+            color: var(--text-primary);
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .article-content h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 32px 0 16px;
+            color: var(--text-primary);
+        }
+
+        .article-content h4 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 24px 0 12px;
+            color: var(--text-primary);
+        }
+
+        .article-content p {
+            margin-bottom: 20px;
+        }
+
+        .article-content code {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            color: var(--accent);
+        }
+
+        .article-content pre {
+            background: var(--bg-tertiary);
+            padding: 24px;
+            border-radius: 12px;
+            overflow-x: auto;
+            margin: 24px 0;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .article-content pre::before {
+            content: 'CODE';
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .article-content pre code {
+            background: transparent;
+            padding: 0;
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        .article-content ul, .article-content ol {
+            margin-left: 24px;
+            margin-bottom: 20px;
+        }
+
+        .article-content li {
+            margin-bottom: 10px;
+        }
+
+        .article-content blockquote {
+            border-left: 4px solid var(--accent);
+            padding: 16px 24px;
+            margin: 24px 0;
+            background: rgba(0, 212, 255, 0.05);
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        .article-content img {
+            max-width: 100%;
+            border-radius: 12px;
+            margin: 20px 0;
+            box-shadow: var(--shadow-md);
+        }
+
+        .article-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .article-content th,
+        .article-content td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .article-content th {
+            background: var(--bg-hover);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .article-content tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent);
+            text-decoration: none;
+            margin-bottom: 24px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 40px;
+        }
+
+        .page-btn {
+            padding: 10px 16px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .page-btn:hover:not(.active) {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .page-btn.active {
+            background: rgba(0, 212, 255, 0.15);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 1024px) {
+            .blog-container {
+                grid-template-columns: 1fr 280px;
+                gap: 32px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .blog-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .article-title {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .article-title {
+                font-size: 24px;
+            }
+
+            .blog-card {
+                padding: 20px;
+            }
+
+            .blog-title {
+                font-size: 19px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">MySite</div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="works.html">作品</a></li>
+                <li><a href="blog.html" class="active">博客</a></li>
+                <li><a href="ai-chat.html">AI聊天</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container blog-container">
+            <div class="main-content">
+                <div class="blog-list" id="blogList">
+                    <article class="blog-card" onclick="openArticle('article1')">
+                        <div class="blog-header">
+                            <div class="blog-meta">
+                                <span>2026-05-15</span>
+                                <span class="blog-category">前端</span>
+                            </div>
+                        </div>
+                        <h2 class="blog-title">Vue 3 组合式API深度解析</h2>
+                        <p class="blog-summary">深入理解Vue 3的Composition API，掌握现代前端开发模式。本文将详细介绍setup函数、ref、reactive等核心概念，以及如何利用组合式API构建可维护的大型应用。</p>
+                        <div class="blog-footer">
+                            <div class="blog-tags">
+                                <span class="tag">Vue</span>
+                                <span class="tag">JavaScript</span>
+                                <span class="tag">前端</span>
+                            </div>
+                            <span class="blog-read">阅读更多 →</span>
+                        </div>
+                    </article>
+
+                    <article class="blog-card" onclick="openArticle('article2')">
+                        <div class="blog-header">
+                            <div class="blog-meta">
+                                <span>2026-05-10</span>
+                                <span class="blog-category">后端</span>
+                            </div>
+                        </div>
+                        <h2 class="blog-title">Spring Boot 3 新特性详解</h2>
+                        <p class="blog-summary">探索Spring Boot 3的最新特性，包括GraalVM原生镜像支持、Jakarta EE 9集成、虚拟线程等重要更新，帮助您构建更高效的Java应用。</p>
+                        <div class="blog-footer">
+                            <div class="blog-tags">
+                                <span class="tag">Spring Boot</span>
+                                <span class="tag">Java</span>
+                                <span class="tag">后端</span>
+                            </div>
+                            <span class="blog-read">阅读更多 →</span>
+                        </div>
+                    </article>
+
+                    <article class="blog-card" onclick="openArticle('article3')">
+                        <div class="blog-header">
+                            <div class="blog-meta">
+                                <span>2026-05-05</span>
+                                <span class="blog-category">AI</span>
+                            </div>
+                        </div>
+                        <h2 class="blog-title">AI编程工作流优化指南</h2>
+                        <p class="blog-summary">如何利用AI工具提升日常开发效率，从代码补全到自动化测试，全面提升开发体验和代码质量。</p>
+                        <div class="blog-footer">
+                            <div class="blog-tags">
+                                <span class="tag">AI</span>
+                                <span class="tag">Productivity</span>
+                            </div>
+                            <span class="blog-read">阅读更多 →</span>
+                        </div>
+                    </article>
+
+                    <article class="blog-card" onclick="openArticle('article4')">
+                        <div class="blog-header">
+                            <div class="blog-meta">
+                                <span>2026-04-28</span>
+                                <span class="blog-category">DevOps</span>
+                            </div>
+                        </div>
+                        <h2 class="blog-title">Docker容器化部署最佳实践</h2>
+                        <p class="blog-summary">学习如何构建高效的Docker镜像，优化容器部署流程，提升应用运行效率和可扩展性。</p>
+                        <div class="blog-footer">
+                            <div class="blog-tags">
+                                <span class="tag">Docker</span>
+                                <span class="tag">DevOps</span>
+                                <span class="tag">部署</span>
+                            </div>
+                            <span class="blog-read">阅读更多 →</span>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="pagination">
+                    <button class="page-btn" disabled>←</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">→</button>
+                </div>
+
+                <div class="article-detail" id="articleDetail">
+                    <a href="#" class="back-btn" onclick="closeArticle()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5"/>
+                            <path d="M12 19l-7-7 7-7"/>
+                        </svg>
+                        返回列表
+                    </a>
+                    <article id="articleContent">
+                    </article>
+                </div>
+            </div>
+
+            <aside class="sidebar">
+                <div class="sidebar-section author-card">
+                    <div class="author-avatar">👨‍💻</div>
+                    <h4 class="author-name">Developer</h4>
+                    <p class="author-desc">全栈开发者，热爱技术分享</p>
+                    <p class="author-bio">专注于Web开发、云原生技术和AI应用，致力于创造有价值的技术内容。</p>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-value">491</div>
+                            <div class="stat-label">文章</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">24</div>
+                            <div class="stat-label">标签</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">82</div>
+                            <div class="stat-label">分类</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h4 class="sidebar-title">文章分类</h4>
+                    <ul class="category-list">
+                        <li class="category-item">前端 <span class="category-count">128</span></li>
+                        <li class="category-item">后端 <span class="category-count">96</span></li>
+                        <li class="category-item">AI <span class="category-count">64</span></li>
+                        <li class="category-item">DevOps <span class="category-count">48</span></li>
+                        <li class="category-item">数据库 <span class="category-count">36</span></li>
+                    </ul>
+                </div>
+
+                <div class="sidebar-section">
+                    <h4 class="sidebar-title">最新发布</h4>
+                    <ul class="recent-posts">
+                        <li class="recent-item" onclick="openArticle('article1')">
+                            <div class="recent-title">Vue 3 组合式API深度解析</div>
+                            <div class="recent-date">2026-05-15</div>
+                        </li>
+                        <li class="recent-item" onclick="openArticle('article2')">
+                            <div class="recent-title">Spring Boot 3 新特性详解</div>
+                            <div class="recent-date">2026-05-10</div>
+                        </li>
+                        <li class="recent-item" onclick="openArticle('article3')">
+                            <div class="recent-title">AI编程工作流优化指南</div>
+                            <div class="recent-date">2026-05-05</div>
+                        </li>
+                        <li class="recent-item" onclick="openArticle('article4')">
+                            <div class="recent-title">Docker容器化部署最佳实践</div>
+                            <div class="recent-date">2026-04-28</div>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>关于我</h4>
+                    <p>全栈开发者，热爱技术，乐于分享</p>
+                </div>
+                <div class="footer-section">
+                    <h4>联系方式</h4>
+                    <p>Email: hello@example.com</p>
+                    <p>GitHub: @username</p>
+                </div>
+                <div class="footer-section">
+                    <h4>快速链接</h4>
+                    <ul>
+                        <li><a href="index.html">首页</a></li>
+                        <li><a href="works.html">作品</a></li>
+                        <li><a href="blog.html">博客</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Personal Website. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            const hamburger = document.getElementById('hamburger');
+            navLinks.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        }
+
+        const articles = {
+            article1: {
+                title: 'Vue 3 组合式API深度解析',
+                meta: '2026-05-15 · 前端 · 阅读时间: 8分钟',
+                content: `
+<h2>一、什么是组合式API</h2>
+<p>Vue 3引入了Composition API，这是一种全新的组织组件逻辑的方式。与Options API相比，它提供了更好的代码组织和复用能力，特别适合处理复杂的组件逻辑。</p>
+
+<h3>1.1 setup函数</h3>
+<p><code>setup</code>是组合式API的入口函数，在组件创建之前执行。它接收两个参数：</p>
+<ul>
+<li><code>props</code>：组件的属性</li>
+<li><code>context</code>：上下文对象，包含emit、slots等</li>
+</ul>
+
+<h3>1.2 ref和reactive</h3>
+<p><code>ref</code>用于创建响应式的基本类型值：</p>
+<pre><code>import { ref } from 'vue'
+const count = ref(0)
+console.log(count.value) // 0
+
+count.value++
+console.log(count.value) // 1
+</code></pre>
+
+<p><code>reactive</code>用于创建响应式对象：</p>
+<pre><code>import { reactive } from 'vue'
+const state = reactive({
+  count: 0,
+  name: 'Vue'
+})
+console.log(state.count) // 0
+state.count++
+console.log(state.count) // 1
+</code></pre>
+
+<h2>二、计算属性</h2>
+<p>使用<code>computed</code>创建计算属性：</p>
+<pre><code>import { ref, computed } from 'vue'
+const firstName = ref('John')
+const lastName = ref('Doe')
+const fullName = computed(() => {
+  return \`\${firstName.value} \${lastName.value}\`
+})
+</code></pre>
+
+<blockquote>计算属性会根据依赖自动缓存，只有当依赖变化时才会重新计算。</blockquote>
+
+<h2>三、侦听器</h2>
+<p><code>watch</code>用于响应数据变化：</p>
+<pre><code>import { ref, watch } from 'vue'
+const count = ref(0)
+
+watch(count, (newValue, oldValue) => {
+  console.log(\`count changed from \${oldValue} to \${newValue}\`)
+})
+</code></pre>
+
+<h2>四、总结</h2>
+<p>组合式API为Vue带来了更灵活的代码组织方式，特别适合处理复杂的组件逻辑。通过ref、reactive、computed等API，可以编写出更加清晰和可维护的代码。`
+            },
+            article2: {
+                title: 'Spring Boot 3 新特性详解',
+                meta: '2026-05-10 · 后端 · 阅读时间: 10分钟',
+                content: `
+<h2>一、Java 21 支持</h2>
+<p>Spring Boot 3.2+ 支持Java 21作为默认版本，带来了许多新特性：</p>
+<ul>
+<li>虚拟线程（Virtual Threads）</li>
+<li>模式匹配增强</li>
+<li>记录模式（Record Patterns）</li>
+<li>字符串模板（String Templates）</li>
+</ul>
+
+<h2>二、GraalVM原生镜像</h2>
+<p>Spring Boot 3对GraalVM原生镜像提供了更好的支持：</p>
+<pre><code>&lt;plugin&gt;
+    &lt;groupId&gt;org.graalvm.buildtools&lt;/groupId&gt;
+    &lt;artifactId&gt;native-maven-plugin&lt;/artifactId&gt;
+&lt;/plugin&gt;
+</code></pre>
+
+<p>原生镜像的优势：</p>
+<ul>
+<li>启动时间极快（毫秒级）</li>
+<li>内存占用更低</li>
+<li>适合Serverless环境</li>
+</ul>
+
+<h2>三、Jakarta EE 9</h2>
+<p>从Spring Boot 3开始，所有javax.*包迁移到jakarta.*：</p>
+<pre><code>// 旧版
+import javax.servlet.http.HttpServletRequest;
+
+// 新版
+import jakarta.servlet.http.HttpServletRequest;
+</code></pre>
+
+<h2>四、新的配置方式</h2>
+<p>支持使用<code>@ConfigurationProperties</code>绑定配置：</p>
+<pre><code>@ConfigurationProperties(prefix = "app")
+public class AppProperties {
+    private String name;
+    private int timeout;
+    // getters/setters
+}
+</code></pre>
+
+<h2>五、虚拟线程实战</h2>
+<p>使用虚拟线程处理高并发请求：</p>
+<pre><code>@Bean
+public ExecutorService virtualThreadExecutor() {
+    return Executors.newVirtualThreadPerTaskExecutor();
+}
+</code></pre>`
+            },
+            article3: {
+                title: 'AI编程工作流优化指南',
+                meta: '2026-05-05 · AI · 阅读时间: 6分钟',
+                content: `
+<h2>一、AI代码补全</h2>
+<p>利用AI工具提升编码效率：</p>
+<ul>
+<li>GitHub Copilot</li>
+<li>Cursor</li>
+<li>CodeLlama</li>
+<li>Amazon CodeWhisperer</li>
+</ul>
+
+<h2>二、自动化测试</h2>
+<p>AI可以帮助生成测试用例：</p>
+<pre><code>// AI生成的单元测试示例
+@Test
+void shouldCalculateTotalPrice() {
+    ShoppingCart cart = new ShoppingCart();
+    cart.addItem(new Item("Apple", 10.0, 2));
+    assertEquals(20.0, cart.getTotal());
+}
+</code></pre>
+
+<h2>三、代码审查</h2>
+<p>AI辅助代码审查，发现潜在问题：</p>
+<ul>
+<li>性能问题</li>
+<li>安全漏洞</li>
+<li>代码异味</li>
+<li>最佳实践违反</li>
+</ul>
+
+<h2>四、文档生成</h2>
+<p>自动生成API文档和注释：</p>
+<pre><code>/**
+ * 计算购物车总价
+ * @param items 商品列表
+ * @return 总价
+ */
+public double calculateTotal(List<Item> items) {
+    return items.stream()
+        .mapToDouble(Item::getPrice)
+        .sum();
+}
+</code></pre>
+
+<blockquote>AI不是替代开发者，而是提升开发者的效率和质量。</blockquote>`
+            },
+            article4: {
+                title: 'Docker容器化部署最佳实践',
+                meta: '2026-04-28 · DevOps · 阅读时间: 7分钟',
+                content: `
+<h2>一、Dockerfile优化</h2>
+<p>编写高效的Dockerfile：</p>
+<pre><code>FROM openjdk:21-jdk-slim
+
+WORKDIR /app
+
+COPY target/app.jar .
+
+EXPOSE 8080
+
+CMD ["java", "-jar", "app.jar"]
+</code></pre>
+
+<h2>二、多阶段构建</h2>
+<p>减少镜像体积：</p>
+<pre><code>FROM maven:3.9 AS builder
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+FROM openjdk:21-jdk-slim
+WORKDIR /app
+COPY --from=builder /app/target/app.jar .
+EXPOSE 8080
+CMD ["java", "-jar", "app.jar"]
+</code></pre>
+
+<h2>三、健康检查</h2>
+<p>添加健康检查：</p>
+<pre><code>HEALTHCHECK --interval=30s --timeout=3s \\
+  CMD curl -f http://localhost:8080/health || exit 1
+</code></pre>
+
+<h2>四、环境变量配置</h2>
+<p>使用环境变量配置应用：</p>
+<pre><code>FROM openjdk:21-jdk-slim
+WORKDIR /app
+COPY target/app.jar .
+EXPOSE 8080
+ENV SPRING_PROFILES_ACTIVE=prod
+CMD ["java", "-jar", "app.jar"]
+</code></pre>
+
+<h2>五、.dockerignore</h2>
+<p>排除不必要的文件：</p>
+<pre><code>target/
+.git/
+node_modules/
+*.log
+</code></pre>`
+            }
+        };
+
+        function openArticle(articleId) {
+            document.getElementById('blogList').style.display = 'none';
+            document.querySelector('.pagination').style.display = 'none';
+            const detail = document.getElementById('articleDetail');
+            detail.classList.add('active');
+            
+            const article = articles[articleId];
+            document.getElementById('articleContent').innerHTML = `
+                <header class="article-header">
+                    <h1 class="article-title">${article.title}</h1>
+                    <div class="article-meta">${article.meta}</div>
+                </header>
+                <div class="article-content">${article.content}</div>
+            `;
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function closeArticle() {
+            event.preventDefault();
+            document.getElementById('blogList').style.display = 'flex';
+            document.querySelector('.pagination').style.display = 'flex';
+            document.getElementById('articleDetail').classList.remove('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作品 - Personal Website</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        main {
+            padding-top: 64px;
+        }
+
+        .banner-section {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+            margin-bottom: 50px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .banner-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .banner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(10, 10, 10, 0.9) 0%, transparent 30%, transparent 70%, rgba(10, 10, 10, 0.9) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .banner-title {
+            font-size: 40px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-shadow: 0 4px 30px rgba(0, 212, 255, 0.3);
+            letter-spacing: -1px;
+        }
+
+        .banner-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 40px;
+            padding: 16px 20px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        .nav-tabs::-webkit-scrollbar {
+            height: 0;
+        }
+
+        .tab-btn {
+            padding: 12px 28px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            background: rgba(0, 212, 255, 0.15);
+            color: var(--accent);
+            box-shadow: 0 0 0 1px rgba(0, 212, 255, 0.2);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .works-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 24px;
+        }
+
+        .work-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .work-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+            transform: scaleX(0);
+            transition: transform 0.35s ease;
+        }
+
+        .work-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-accent);
+        }
+
+        .work-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .work-thumbnail {
+            width: 100%;
+            height: 160px;
+            background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-card));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .work-thumbnail::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, transparent 60%, rgba(0, 0, 0, 0.6));
+        }
+
+        .work-icon {
+            font-size: 56px;
+            opacity: 0.8;
+            z-index: 1;
+            transition: transform 0.3s ease;
+        }
+
+        .work-card:hover .work-icon {
+            transform: scale(1.1);
+        }
+
+        .work-duration {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            padding: 4px 10px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 6px;
+            font-size: 12px;
+            color: #fff;
+            font-weight: 500;
+            z-index: 1;
+        }
+
+        .work-info {
+            padding: 20px;
+        }
+
+        .work-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            color: var(--text-primary);
+        }
+
+        .work-stats {
+            display: flex;
+            gap: 20px;
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .work-author {
+            color: var(--text-secondary);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .author-avatar {
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, var(--accent), var(--success));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        .load-more {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .load-more-btn {
+            padding: 14px 40px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.25s ease;
+        }
+
+        .load-more-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        @media (max-width: 768px) {
+            .banner-section {
+                height: 160px;
+            }
+
+            .banner-title {
+                font-size: 28px;
+            }
+
+            .works-grid {
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                gap: 16px;
+            }
+
+            .tab-btn {
+                padding: 10px 20px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .banner-title {
+                font-size: 24px;
+            }
+
+            .works-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">MySite</div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="works.html" class="active">作品</a></li>
+                <li><a href="blog.html">博客</a></li>
+                <li><a href="ai-chat.html">AI聊天</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="banner-section">
+            <canvas class="banner-canvas" id="bannerCanvas"></canvas>
+            <div class="banner-overlay">
+                <div>
+                    <h1 class="banner-title">项目作品</h1>
+                    <p class="banner-subtitle">探索我的技术实践与创意成果</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="container">
+            <div class="nav-tabs">
+                <button class="tab-btn active" onclick="switchTab('hot')">
+                    <span>🔥</span> 热门
+                </button>
+                <button class="tab-btn" onclick="switchTab('new')">
+                    <span>✨</span> 最新发布
+                </button>
+                <button class="tab-btn" onclick="switchTab('tech')">
+                    <span>💻</span> 技术项目
+                </button>
+                <button class="tab-btn" onclick="switchTab('design')">
+                    <span>🎨</span> 设计作品
+                </button>
+                <button class="tab-btn" onclick="switchTab('ai')">
+                    <span>🤖</span> AI项目
+                </button>
+            </div>
+
+            <div class="works-grid" id="worksGrid">
+                <div class="work-card">
+                    <div class="work-thumbnail">
+                        <span class="work-icon">🎨</span>
+                        <span class="work-duration">2024</span>
+                    </div>
+                    <div class="work-info">
+                        <h3 class="work-title">AI创作平台 - 可视化AI生图工作流</h3>
+                        <div class="work-stats">
+                            <span class="stat-item">⭐ 2.5k</span>
+                            <span class="stat-item">👁️ 12k</span>
+                            <span class="stat-item">🍴 320</span>
+                        </div>
+                        <p class="work-author">
+                            <span class="author-avatar">D</span>
+                            @developer
+                        </p>
+                    </div>
+                </div>
+
+                <div class="work-card">
+                    <div class="work-thumbnail">
+                        <span class="work-icon">💼</span>
+                        <span class="work-duration">2024</span>
+                    </div>
+                    <div class="work-info">
+                        <h3 class="work-title">企业管理系统 - 完整的后台解决方案</h3>
+                        <div class="work-stats">
+                            <span class="stat-item">⭐ 1.8k</span>
+                            <span class="stat-item">👁️ 8.5k</span>
+                            <span class="stat-item">🍴 180</span>
+                        </div>
+                        <p class="work-author">
+                            <span class="author-avatar">D</span>
+                            @developer
+                        </p>
+                    </div>
+                </div>
+
+                <div class="work-card">
+                    <div class="work-thumbnail">
+                        <span class="work-icon">📱</span>
+                        <span class="work-duration">2023</span>
+                    </div>
+                    <div class="work-info">
+                        <h3 class="work-title">移动端应用 - 跨平台移动开发</h3>
+                        <div class="work-stats">
+                            <span class="stat-item">⭐ 1.2k</span>
+                            <span class="stat-item">👁️ 6k</span>
+                            <span class="stat-item">🍴 98</span>
+                        </div>
+                        <p class="work-author">
+                            <span class="author-avatar">D</span>
+                            @developer
+                        </p>
+                    </div>
+                </div>
+
+                <div class="work-card">
+                    <div class="work-thumbnail">
+                        <span class="work-icon">☁️</span>
+                        <span class="work-duration">2024</span>
+                    </div>
+                    <div class="work-info">
+                        <h3 class="work-title">云服务平台 - 微服务架构设计</h3>
+                        <div class="work-stats">
+                            <span class="stat-item">⭐ 2.1k</span>
+                            <span class="stat-item">👁️ 10k</span>
+                            <span class="stat-item">🍴 256</span>
+                        </div>
+                        <p class="work-author">
+                            <span class="author-avatar">D</span>
+                            @developer
+                        </p>
+                    </div>
+                </div>
+
+                <div class="work-card">
+                    <div class="work-thumbnail">
+                        <span class="work-icon">🤖</span>
+                        <span class="work-duration">2024</span>
+                    </div>
+                    <div class="work-info">
+                        <h3 class="work-title">AI助手应用 - 智能对话系统</h3>
+                        <div class="work-stats">
+                            <span class="stat-item">⭐ 3.2k</span>
+                            <span class="stat-item">👁️ 15k</span>
+                            <span class="stat-item">🍴 420</span>
+                        </div>
+                        <p class="work-author">
+                            <span class="author-avatar">D</span>
+                            @developer
+                        </p>
+                    </div>
+                </div>
+
+                <div class="work-card">
+                    <div class="work-thumbnail">
+                        <span class="work-icon">🎮</span>
+                        <span class="work-duration">2023</span>
+                    </div>
+                    <div class="work-info">
+                        <h3 class="work-title">Web游戏开发 - 交互式网页游戏</h3>
+                        <div class="work-stats">
+                            <span class="stat-item">⭐ 1.5k</span>
+                            <span class="stat-item">👁️ 9k</span>
+                            <span class="stat-item">🍴 167</span>
+                        </div>
+                        <p class="work-author">
+                            <span class="author-avatar">D</span>
+                            @developer
+                        </p>
+                    </div>
+                </div>
+
+                <div class="work-card">
+                    <div class="work-thumbnail">
+                        <span class="work-icon">📊</span>
+                        <span class="work-duration">2024</span>
+                    </div>
+                    <div class="work-info">
+                        <h3 class="work-title">数据可视化 - 实时数据分析平台</h3>
+                        <div class="work-stats">
+                            <span class="stat-item">⭐ 1.7k</span>
+                            <span class="stat-item">👁️ 7.5k</span>
+                            <span class="stat-item">🍴 143</span>
+                        </div>
+                        <p class="work-author">
+                            <span class="author-avatar">D</span>
+                            @developer
+                        </p>
+                    </div>
+                </div>
+
+                <div class="work-card">
+                    <div class="work-thumbnail">
+                        <span class="work-icon">🛒</span>
+                        <span class="work-duration">2023</span>
+                    </div>
+                    <div class="work-info">
+                        <h3 class="work-title">电商平台 - 全栈电商解决方案</h3>
+                        <div class="work-stats">
+                            <span class="stat-item">⭐ 2.3k</span>
+                            <span class="stat-item">👁️ 11k</span>
+                            <span class="stat-item">🍴 289</span>
+                        </div>
+                        <p class="work-author">
+                            <span class="author-avatar">D</span>
+                            @developer
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="load-more">
+                <button class="load-more-btn">加载更多作品</button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>关于我</h4>
+                    <p>全栈开发者，热爱技术，乐于分享</p>
+                </div>
+                <div class="footer-section">
+                    <h4>联系方式</h4>
+                    <p>Email: hello@example.com</p>
+                    <p>GitHub: @username</p>
+                </div>
+                <div class="footer-section">
+                    <h4>快速链接</h4>
+                    <ul>
+                        <li><a href="index.html">首页</a></li>
+                        <li><a href="works.html">作品</a></li>
+                        <li><a href="blog.html">博客</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Personal Website. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            const hamburger = document.getElementById('hamburger');
+            navLinks.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        }
+
+        function switchTab(tab) {
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        (function() {
+            const canvas = document.getElementById('bannerCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            function resize() {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            const player = {
+                x: 80,
+                y: canvas.height - 80,
+                width: 32,
+                height: 45,
+                velocityY: 0,
+                isJumping: false,
+                isCrouching: false,
+                color: '#00d4ff',
+                frame: 0
+            };
+
+            const obstacles = [];
+            let frame = 0;
+            let scrollOffset = 0;
+            let score = 0;
+
+            function createObstacle() {
+                const type = Math.random() > 0.65 ? 'high' : Math.random() > 0.85 ? 'tall' : 'low';
+                obstacles.push({
+                    x: canvas.width + 60,
+                    y: canvas.height - (type === 'high' ? 35 : type === 'tall' ? 20 : 70),
+                    width: type === 'tall' ? 15 : 25 + Math.random() * 35,
+                    height: type === 'high' ? 30 : type === 'tall' ? 55 : 35,
+                    color: type === 'tall' ? '#ffaa00' : '#e94560',
+                    type: type
+                });
+            }
+
+            function drawPlayer() {
+                ctx.fillStyle = player.color;
+                
+                ctx.shadowColor = player.color;
+                ctx.shadowBlur = 15;
+                
+                if (player.isCrouching) {
+                    ctx.fillRect(player.x, player.y + 25, player.width, player.height - 25);
+                    ctx.fillRect(player.x + 4, player.y + 12, player.width - 8, 18);
+                    ctx.fillRect(player.x + 8, player.y + 5, player.width - 16, 10);
+                } else {
+                    ctx.fillRect(player.x, player.y, player.width, player.height);
+                    ctx.fillRect(player.x + 4, player.y - 12, player.width - 8, 18);
+                    ctx.fillRect(player.x + 8, player.y - 18, player.width - 16, 10);
+                }
+                
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(player.x + 8, player.y + 10, 6, 6);
+                ctx.fillRect(player.x + 18, player.y + 10, 6, 6);
+                
+                ctx.shadowBlur = 0;
+            }
+
+            function drawObstacles() {
+                obstacles.forEach(obs => {
+                    const drawX = obs.x - scrollOffset;
+                    
+                    ctx.fillStyle = obs.color;
+                    ctx.shadowColor = obs.color;
+                    ctx.shadowBlur = 10;
+                    
+                    ctx.fillRect(drawX, obs.y, obs.width, obs.height);
+                    
+                    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                    ctx.fillRect(drawX + 3, obs.y + 3, obs.width - 6, obs.height - 6);
+                    
+                    ctx.shadowBlur = 0;
+                });
+            }
+
+            function drawBackground() {
+                const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                gradient.addColorStop(0, '#0f0f1a');
+                gradient.addColorStop(1, '#16213e');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = '#1a1a2e';
+                for (let i = 0; i < canvas.width; i += 60) {
+                    const x = (i - scrollOffset % 60 + canvas.width) % canvas.width;
+                    ctx.fillRect(x, canvas.height - 12, 50, 3);
+                }
+                
+                ctx.fillStyle = '#1f1f3a';
+                for (let i = 0; i < canvas.width; i += 120) {
+                    const x = (i - scrollOffset % 120 + canvas.width) % canvas.width;
+                    ctx.fillRect(x, canvas.height - 22, 70, 3);
+                }
+                
+                ctx.fillStyle = '#25254a';
+                for (let i = 0; i < canvas.width; i += 200) {
+                    const x = (i - scrollOffset % 200 + canvas.width) % canvas.width;
+                    ctx.fillRect(x, canvas.height - 35, 100, 4);
+                }
+                
+                ctx.fillStyle = '#00d4ff';
+                ctx.globalAlpha = 0.05;
+                for (let i = 0; i < canvas.width; i += 80) {
+                    const x = (i - scrollOffset % 80 + canvas.width) % canvas.width;
+                    ctx.beginPath();
+                    ctx.arc(x, canvas.height - 50, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.globalAlpha = 1;
+            }
+
+            function drawScore() {
+                ctx.fillStyle = '#00d4ff';
+                ctx.font = 'bold 18px Inter';
+                ctx.textAlign = 'right';
+                ctx.fillText(`分数: ${score}`, canvas.width - 20, 35);
+            }
+
+            function update() {
+                frame++;
+                player.frame++;
+                
+                if (frame % 50 === 0) {
+                    createObstacle();
+                }
+
+                scrollOffset += 4;
+                score++;
+
+                if ((frame % 40 === 0 || frame % 120 === 0) && !player.isJumping) {
+                    player.isJumping = true;
+                    player.velocityY = frame % 120 === 0 ? -16 : -12;
+                }
+
+                if (player.isJumping) {
+                    player.velocityY += 0.9;
+                    player.y += player.velocityY;
+                    
+                    if (player.y >= canvas.height - 80) {
+                        player.y = canvas.height - 80;
+                        player.isJumping = false;
+                        player.velocityY = 0;
+                        player.isCrouching = false;
+                    }
+                }
+
+                if (player.frame > 20 && player.frame < 30) {
+                    player.isCrouching = true;
+                }
+
+                obstacles.forEach((obs, index) => {
+                    obs.x -= 4;
+                    
+                    if (obs.x + obs.width < -scrollOffset) {
+                        obstacles.splice(index, 1);
+                        score += 10;
+                    }
+                });
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawBackground();
+                drawObstacles();
+                drawPlayer();
+                drawScore();
+
+                requestAnimationFrame(update);
+            }
+
+            update();
+        })();
+    </script>
+</body>
+</html>
